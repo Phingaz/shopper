@@ -1,9 +1,11 @@
-export function capitalizeFirstLetter(string: string): string {
-  return string?.charAt(0).toUpperCase() + string.slice(1);
+export function capitalizeFirstLetter(str: string): string {
+  if (!str) return "";
+  return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
-export function lowercaseFirstLetter(string: string): string {
-  return string?.charAt(0).toLowerCase() + string.slice(1);
+export function lowercaseFirstLetter(str: string): string {
+  if (!str) return "";
+  return str.charAt(0).toLowerCase() + str.slice(1);
 }
 
 export const processBase64Image = (

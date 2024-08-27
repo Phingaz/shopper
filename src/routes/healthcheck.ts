@@ -9,7 +9,7 @@ router.route("/").get((req, res) => {
 
 router.route("*").all((req, res) => {
   errorHandler({
-    code: 400,
+    code: 404,
     req,
     res,
     error: new Error("Invalid route"),
