@@ -1,6 +1,7 @@
 import "dotenv/config";
 import cors from "cors";
 import express from "express";
+import mongoose from "mongoose";
 import logger from "./middlewares/logger.js";
 import { router as gemini } from "./routes/gemini.js";
 import { router as health } from "./routes/healthcheck.js";
@@ -33,9 +34,11 @@ const port = process.env.PORT || 3001;
 
 const start = async () => {
   try {
+    const d = await mongoose.connect(process.env.MONGO_URL);
+    console.log("Connected to database: " + d.connection.name);
     app.listen(port, () => console.log("App started on port " + port));
   } catch (error) {
-    console.log(error);
+    console.error(error);
   }
 };
 
