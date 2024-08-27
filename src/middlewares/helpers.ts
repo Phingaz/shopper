@@ -1,4 +1,4 @@
-import { errorHandler } from "../utils/resHandler";
+import { errorHandler } from "../utils/resHandler.js";
 
 const logger = (req: Req, _: Res, next: NextFn) => {
   console.log(

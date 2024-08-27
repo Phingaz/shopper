@@ -5,11 +5,11 @@ import express from "express";
 import mongoose from "mongoose";
 import { fileURLToPath } from "url";
 import path, { dirname } from "path";
+import { getBucket } from "./utils/minio.js";
 import { router as gemini } from "./routes/gemini.js";
 import { router as health } from "./routes/healthcheck.js";
 import { logger, expectJsonBody } from "./middlewares/helpers.js";
 import { errorHandler, successHandler } from "./utils/resHandler.js";
-import { getBucket } from "./utils/minio.js";
 
 const app = express();
 

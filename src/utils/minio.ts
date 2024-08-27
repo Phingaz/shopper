@@ -1,5 +1,5 @@
 import * as Minio from "minio";
-import envValues from "./env";
+import envValues from "./env.js";
 
 const minioClient = new Minio.Client({
   useSSL: false,

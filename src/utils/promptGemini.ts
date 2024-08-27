@@ -1,5 +1,5 @@
 import { GoogleGenerativeAI, Part } from "@google/generative-ai";
-import envValues from "./env";
+import envValues from "./env.js";
 
 const { geminiKey } = envValues;
 

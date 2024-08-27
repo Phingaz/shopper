@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { TMeasurementType } from "../types/gemini";
+import { TMeasurementType } from "../types/gemini.js";
 
 const ReadingSchema = new mongoose.Schema(
   {

@@ -9,7 +9,8 @@
     "noImplicitAny": false,
     "outDir": "dist",
     "removeComments": true,
-    "target": "ES6",
+    "target": "ES2021",
+    "lib": ["ES2021", "DOM"],
     "types": ["node", "express"],
     "typeRoots": ["node_modules/@types", "./src/types"]
   },
