@@ -21,3 +21,17 @@ export const processBase64Image = (
 
   return { type: mimeType, data };
 };
+
+export const generateRandomUuid = (): string => {
+  const randomHex = () => Math.floor(Math.random() * 16).toString(16);
+  const uuidTemplate = "xxxxxxxx-4xxx-yyyxxxxxxxxxx";
+
+  const uuid = uuidTemplate.replace(/[xy]/g, function (char) {
+    const rand = randomHex();
+    const value =
+      char === "x" ? rand : ((parseInt(rand, 16) & 0x3) | 0x8).toString(16);
+    return value;
+  });
+
+  return uuid;
+};

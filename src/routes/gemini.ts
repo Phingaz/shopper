@@ -4,9 +4,9 @@ import { upload, confirm, listMeasures } from "../controllers/gemini.js";
 
 const router = express.Router();
 
-router.route("/").get(listMeasures);
+router.route("/:id/list").get(listMeasures);
 router.route("/upload").post(upload);
-router.route("/confirm/:id").patch(confirm);
+router.route("/confirm").patch(confirm);
 
 router.route("*").all((req, res) => {
   errorHandler({
