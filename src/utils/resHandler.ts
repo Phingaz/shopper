@@ -33,7 +33,7 @@ const successHandler = ({
   res,
   data,
 }: {
-  message: string;
+  message?: string;
   req: Req;
   res: Res;
   data: any;
@@ -46,8 +46,8 @@ const successHandler = ({
 
   res.status(200).json({
     success: true,
-    message,
-    data,
+    message: message || "Success",
+    ...data,
   });
 };
 
