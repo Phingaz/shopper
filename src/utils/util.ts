@@ -9,12 +9,12 @@ export function lowercaseFirstLetter(string: string): string {
 export const processBase64Image = (
   base64: string
 ): { type: string; data: string } | null => {
+  if (!base64) return null;
+
   const base64Regex = /^data:image\/(png|jpeg|jpg|gif|bmp|webp);base64,/;
   const match = base64.match(base64Regex);
 
-  if (!match) {
-    return null;
-  }
+  if (!match) return null;
 
   const mimeType = match[1];
   const data = base64.split(",")[1];
