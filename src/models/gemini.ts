@@ -3,10 +3,10 @@ import { TMeasurementType } from "../types/gemini";
 
 const ReadingSchema = new mongoose.Schema(
   {
-    image: {
-      type: String,
-      required: [true, "Base64 image is required"],
-    },
+    // image: {
+    //   type: String,
+    //   required: [true, "Base64 image is required"],
+    // },
     customer_code: {
       type: String,
       required: [true, "Customer code is required"],
