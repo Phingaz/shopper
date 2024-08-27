@@ -1,11 +1,13 @@
 const errorHandler = ({
-  error,
   req,
   res,
   code,
+  error,
+  error_code,
 }: {
   code: number;
   error: Error;
+  error_code?: string;
   req: Req;
   res: Res;
 }) => {
@@ -19,7 +21,8 @@ const errorHandler = ({
 
   res.status(code).json({
     success: false,
-    error_code: code,
+    status_code: code,
+    error_code: error_code || "GENERIC_ERROR",
     error_description: error.message,
   });
 };
