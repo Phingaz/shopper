@@ -1,13 +1,26 @@
 import "dotenv/config";
+import fs from "fs";
 import cors from "cors";
 import express from "express";
 import mongoose from "mongoose";
-import { logger, expectJsonBody } from "./middlewares/helpers.js";
+import { fileURLToPath } from "url";
+import path, { dirname } from "path";
 import { router as gemini } from "./routes/gemini.js";
 import { router as health } from "./routes/healthcheck.js";
+import { logger, expectJsonBody } from "./middlewares/helpers.js";
 import { errorHandler, successHandler } from "./utils/resHandler.js";
+import { getBucket } from "./utils/minio.js";
 
 const app = express();
+
+const _filename = fileURLToPath(import.meta.url);
+const _dirname = dirname(_filename);
+
+export const uploadPath = path.join(_dirname, "..", "public", "uploads");
+
+if (!fs.existsSync(uploadPath)) {
+  fs.mkdirSync(uploadPath, { recursive: true });
+}
 
 app.use(cors());
 app.use(express.urlencoded({ extended: false, limit: "5mb" }));
@@ -35,8 +48,11 @@ const port = process.env.PORT || 3001;
 
 const start = async () => {
   try {
-    const d = await mongoose.connect(process.env.MONGO_URL);
-    console.log("Connected to database: " + d.connection.name);
+    const mongo = mongoose.connect(process.env.MONGO_URL);
+    const minio = getBucket();
+
+    await Promise.all([mongo, minio]);
+    console.log("Connected to database and storage.");
     app.listen(port, () => console.log("App started on port " + port));
   } catch (error) {
     console.error(error);
