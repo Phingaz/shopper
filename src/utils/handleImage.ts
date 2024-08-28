@@ -3,19 +3,21 @@ import path from "path";
 import { uploadPath } from "../app.js";
 import envValues from "./env.js";
 
-interface SaveBase64ImageParams {
+interface HandleImageParams {
   base64: string;
   fileName: string;
+  delayMinutes?: number;
 }
 
-interface DeleteLocalFileParams {
+interface ScheduleDeleteParam {
   filePath: string;
+  delayMinutes: number;
 }
 
 export const saveBase64Image = ({
   base64,
   fileName,
-}: SaveBase64ImageParams): Promise<string> => {
+}: HandleImageParams): Promise<string> => {
   return new Promise((resolve, reject) => {
     const buffer = Buffer.from(base64, "base64");
     const filePath = path.join(uploadPath, fileName);
@@ -37,28 +39,51 @@ export const saveBase64Image = ({
 export const handleImage = async ({
   fileName,
   base64,
-}: {
-  fileName: string;
-  base64: string;
-}) => {
-  return new Promise(async (resolve, reject) => {
-    if (!fileName) {
-      reject(new Error("No filename provided"));
-    }
+  delayMinutes = 5,
+}: HandleImageParams) => {
+  if (!fileName) {
+    throw new Error("No filename provided");
+  }
 
+  try {
     await saveBase64Image({ base64, fileName });
-
     const imgUrl = `${envValues.baseUrl}/uploads/${fileName}`;
-    resolve(imgUrl);
-  });
+    scheduleFileDeletion({
+      filePath: path.join(uploadPath, fileName),
+      delayMinutes,
+    });
+    return imgUrl;
+  } catch (error) {
+    console.error(`Failed to handle image: ${error.message}`);
+    throw error;
+  }
 };
 
-const deleteLocalFile = ({ filePath }: DeleteLocalFileParams) => {
-  fs.unlink(filePath, (err) => {
+const scheduleFileDeletion = ({
+  filePath,
+  delayMinutes,
+}: ScheduleDeleteParam) => {
+  const delayMilliseconds = delayMinutes * 60 * 1000;
+  console.log(`Scheduling deletion of ${filePath} in ${delayMinutes} minutes`);
+
+  fs.access(filePath, fs.constants.F_OK, (err) => {
     if (err) {
-      console.error(`Failed to delete file ${filePath}: ${err.message}`);
-    } else {
-      console.log(`File ${filePath} deleted.`);
+      console.error(
+        `File ${filePath} does not exist. Cannot schedule deletion.`
+      );
+      return;
     }
+
+    setTimeout(() => {
+      fs.unlink(filePath, (err) => {
+        if (err) {
+          console.error(`Failed to delete file ${filePath}: ${err.message}`);
+        } else {
+          console.log(
+            `File ${filePath} deleted after ${delayMinutes} minutes.`
+          );
+        }
+      });
+    }, delayMilliseconds);
   });
 };

@@ -2,7 +2,7 @@ import Reading from "../models/gemini.js";
 import { TMeasurementType, TUploadBody } from "../types/gemini.js";
 import { errorHandler, successHandler } from "../utils/resHandler.js";
 import { generateRandomUuid, processBase64Image } from "../utils/util.js";
-import { handleImage, saveBase64Image } from "../utils/handleImage.js";
+import { handleImage } from "../utils/handleImage.js";
 import { promptGemini } from "../utils/promptGemini.js";
 import { measurementTypes } from "../constants.js";
 
@@ -100,6 +100,7 @@ const upload = async (req: Req, res: Res) => {
 
     // Process image and get result from Gemini
     const geminiResult = await promptGemini(data, type);
+
     const formattedDate = new Date(measure_datetime)
       .toISOString()
       .replace(/[^0-9]/g, "")
@@ -107,7 +108,13 @@ const upload = async (req: Req, res: Res) => {
 
     const fileName = `${customer_code}-${measure_type}-${formattedDate}.${type}`;
 
-    const imgUrl = await handleImage({ fileName, base64: data });
+    const imgUrl = await handleImage({
+      fileName,
+      base64: data,
+      delayMinutes: 1,
+    });
+
+    console.log("Gemini Result:", geminiResult);
 
     const value = geminiResult?.measure_value
       ? parseInt(geminiResult.measure_value)
