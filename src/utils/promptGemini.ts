@@ -5,7 +5,7 @@ const { geminiKey } = envValues;
 
 interface GeminiResponse {
   measure_value: string;
-  measure_uuid: string;
+  measure_others: string;
 }
 
 export const promptGemini = async (
@@ -19,8 +19,8 @@ export const promptGemini = async (
     const prompt = `
       Get the texts in this image, return a structured JSON with the texts.
       The primary reading should be the first one with the key measure_value.
-      The secondary value should be with the key measure_uuid.
-      Result must be a JSON with the keys measure_value and measure_uuid.
+      The secondary value should be with the key measure_others.
+      Result must be a JSON with the keys measure_value and measure_others.
       No extras needed and do not include fenced block code, just {} with the data.
       If no reading is found, return null for that key.
       \n\n
@@ -35,17 +35,8 @@ export const promptGemini = async (
 
     // Parse JSON response
     const jsonRes = JSON.parse(res);
-
-    // Validate JSON structure
-    if (
-      typeof jsonRes.measure_value === "string" &&
-      typeof jsonRes.measure_uuid === "string"
-    ) {
-      return jsonRes as GeminiResponse;
-    } else {
-      console.warn("Unexpected response format:", jsonRes);
-      return null;
-    }
+    console.info("Gemini result structure:", jsonRes);
+    return jsonRes as GeminiResponse;
   } catch (error) {
     throw new Error(`Failed to process image with Gemini: ${error.message}`);
   }
