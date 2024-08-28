@@ -27,7 +27,7 @@ const listMeasures = async (req: Req, res: Res) => {
     const measures = await Reading.find({
       customer_code: id,
       ...(measure_type && { measure_type }),
-    }).select("-_id -__v -createdAt -updatedAt -customer_code -measure_value");
+    }).select("-_id -__v -createdAt -updatedAt -customer_code");
 
     if (!measures.length) {
       return errorHandler({
@@ -111,7 +111,7 @@ const upload = async (req: Req, res: Res) => {
     const imgUrl = await handleImage({
       fileName,
       base64: data,
-      delayMinutes: 1,
+      delayMinutes: 300, // 5 hours
     });
 
     console.log("Gemini Result:", geminiResult);

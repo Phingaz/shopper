@@ -64,7 +64,9 @@ const scheduleFileDeletion = ({
   delayMinutes,
 }: ScheduleDeleteParam) => {
   const delayMilliseconds = delayMinutes * 60 * 1000;
-  console.log(`Scheduling deletion of ${filePath} in ${delayMinutes} minutes`);
+  console.log(
+    `Scheduling deletion of ${filePath} in ${delayMinutes} minute(s)`
+  );
 
   fs.access(filePath, fs.constants.F_OK, (err) => {
     if (err) {
