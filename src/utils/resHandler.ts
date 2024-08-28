@@ -16,7 +16,7 @@ const errorHandler = ({
       req.originalUrl
     }, message: ${error.message}, at ${new Date().toISOString()} and stack: ${
       error.stack
-    }`
+    }\n`
   );
 
   res.status(code).json({
@@ -41,7 +41,7 @@ const successHandler = ({
   console.log(
     `Success: ${message}, from base: ${req.baseUrl}, original: ${
       req.originalUrl
-    } at ${new Date().toISOString()}`
+    } at ${new Date().toISOString()}\n`
   );
 
   res.status(200).json({
