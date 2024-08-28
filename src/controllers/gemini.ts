@@ -114,8 +114,6 @@ const upload = async (req: Req, res: Res) => {
       delayMinutes: 300, // 5 hours
     });
 
-    console.log("Gemini Result:", geminiResult);
-
     const value = geminiResult?.measure_value
       ? parseInt(geminiResult.measure_value)
       : 0;
