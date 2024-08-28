@@ -31,6 +31,7 @@ services:
       MINIO_ROOT_PASSWORD: T&se9g0_sM0m
     ports:
       - "9000:9000"
+      - "9001:9001"
     volumes:
       - mini-data:/data
     command: server /data --console-address ":9001"
