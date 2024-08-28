@@ -22,16 +22,16 @@ const listMeasures = async (req: Req, res: Res) => {
         req,
         res,
         code: 400,
-        error_code: "INVALID_DATA",
-        error: new Error("Invalid measurement type"),
+        error_code: "INVALID_TYPE",
+        error: new Error("Tipo de medição não permitida"),
       });
     }
 
     // Fetch measures
     const measures = await Reading.find({
       customer_code: id,
-      ...(measure_type && { measure_type }),
-    });
+      ...(measure_type && { measure_type })
+    }).select("-_id -__v -createdAt -updatedAt -customer_code -measure_value");
 
     if (!measures.length) {
       return errorHandler({
@@ -39,7 +39,7 @@ const listMeasures = async (req: Req, res: Res) => {
         res,
         code: 404,
         error_code: "MEASURES_NOT_FOUND",
-        error: new Error("No readings found"),
+        error: new Error("Nenhuma leitura encontrada"),
       });
     }
 
@@ -47,6 +47,7 @@ const listMeasures = async (req: Req, res: Res) => {
       req,
       res,
       data: { customer_code: id, measures },
+      message: "Operação realizada com sucesso",
     });
   } catch (error) {
     return errorHandler({ code: 500, error, req, res });
@@ -74,7 +75,11 @@ const upload = async (req: Req, res: Res) => {
         res,
         code: 400,
         error_code: "INVALID_DATA",
-        error: new Error(`Invalid Req data: ${missingFields.join(", ")}`),
+        error: new Error(
+          `Os dados fornecidos no corpo da requisição são inválidos: ${missingFields.join(
+            ", "
+          )}`
+        ),
       });
     }
 
@@ -89,7 +94,7 @@ const upload = async (req: Req, res: Res) => {
       return errorHandler({
         code: 409,
         error_code: "DOUBLE_REPORT",
-        error: new Error("Reading for this month already exists"),
+        error: new Error("Leitura do mês já realizada"),
         req,
         res,
       });
@@ -123,7 +128,9 @@ const upload = async (req: Req, res: Res) => {
       60 * 60 * 3
     );
 
-    const value = parseInt(geminiResult.measure_value) || 0;
+    const value = geminiResult?.measure_value
+      ? parseInt(geminiResult.measure_value)
+      : 0;
     const uuid = generateRandomUuid();
 
     // Save reading to the database
@@ -145,6 +152,7 @@ const upload = async (req: Req, res: Res) => {
         measure_value: value,
         measure_uuid: uuid,
       },
+      message: "Operação realizada com sucesso",
     });
   } catch (error) {
     return errorHandler({ code: 500, error, req, res });
@@ -160,7 +168,9 @@ const confirm = async (req: Req, res: Res) => {
       return errorHandler({
         code: 400,
         error_code: "INVALID_DATA",
-        error: new Error("Invalid data in Req body"),
+        error: new Error(
+          "Os dados fornecidos no corpo da requisição são inválidos"
+        ),
         req,
         res,
       });
@@ -172,7 +182,7 @@ const confirm = async (req: Req, res: Res) => {
       return errorHandler({
         code: 404,
         error_code: "MEASURE_NOT_FOUND",
-        error: new Error("Reading not found"),
+        error: new Error("Leitura não encontrada"),
         req,
         res,
       });
@@ -182,7 +192,7 @@ const confirm = async (req: Req, res: Res) => {
       return errorHandler({
         code: 409,
         error_code: "CONFIRMATION_DUPLICATE",
-        error: new Error("Reading already confirmed"),
+        error: new Error("Leitura já confirmada"),
         req,
         res,
       });
@@ -198,6 +208,7 @@ const confirm = async (req: Req, res: Res) => {
       req,
       res,
       data: null,
+      message: "Operação realizada com sucesso",
     });
   } catch (error) {
     return errorHandler({ code: 500, error, req, res });

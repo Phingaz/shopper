@@ -22,12 +22,17 @@ services:
     image: minio/minio:latest
     container_name: minio
     restart: always
+    volumes:
+      - minio-data:/data
     environment:
       MINIO_ROOT_USER: minioadmin
-      MINIO_ROOT_PASSWORD: secureMinioPass123
-    command: server /data
+      MINIO_ROOT_PASSWORD: 8@GvL#2uD!wz3T*mKp9F&Qx
+    command: server /data --console-address ":9001"
     networks:
       - shopper
+    ports:
+      - "9000:9000"
+      - "9001:9001"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
       interval: 30s
@@ -38,7 +43,7 @@ services:
   # Node.js application
   app:
     build: .
-    container_name: node-app
+    container_name: server
     restart: always
     ports:
       - "3001:3001"
@@ -48,7 +53,7 @@ services:
       MINIO_ENDPOINT: minio
       MINIO_PORT: 9000
       MINIO_ROOT_USER: minioadmin
-      MINIO_ROOT_PASSWORD: secureMinioPass123
+      MINIO_ROOT_PASSWORD: 8@GvL#2uD!wz3T*mKp9F&Qx
     depends_on:
       mongo:
         condition: service_healthy
@@ -65,6 +70,7 @@ services:
 
 volumes:
   mongo-data:
+  minio-data:
 
 networks:
   shopper:
