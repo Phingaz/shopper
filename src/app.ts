@@ -11,7 +11,6 @@ import { router as health } from "./routes/healthcheck.js";
 import { logger, expectJsonBody } from "./middlewares/helpers.js";
 import { errorHandler, successHandler } from "./utils/resHandler.js";
 
-
 const app = express();
 
 // Define constants

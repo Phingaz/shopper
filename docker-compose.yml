@@ -6,54 +6,56 @@ services:
     image: mongo:latest
     container_name: mongo
     restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: mongoadmin
+      MONGO_INITDB_ROOT_PASSWORD: FDrs81eAMi6x1*_g
+    # ports:
+    #   - "27017:27017"
     volumes:
       - mongo-data:/data/db
     networks:
       - shopper
     healthcheck:
       test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
-      interval: 30s
+      interval: 15s
       timeout: 10s
-      retries: 5
-      start_period: 1s
+      retries: 3
 
   # MinIO service
   minio:
     image: minio/minio:latest
     container_name: minio
     restart: always
-    volumes:
-      - minio-data:/data
     environment:
       MINIO_ROOT_USER: minioadmin
-      MINIO_ROOT_PASSWORD: 8@GvL#2uD!wz3T*mKp9F&Qx
+      MINIO_ROOT_PASSWORD: T&se9g0_sM0m
+    ports:
+      - "9000:9000"
+    volumes:
+      - mini-data:/data
     command: server /data --console-address ":9001"
     networks:
       - shopper
-    ports:
-      - "9000:9000"
-      - "9001:9001"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 10s
 
   # Node.js application
   app:
     build: .
-    container_name: server
+    container_name: node-app
     restart: always
     ports:
       - "3001:3001"
     environment:
       GEMINI_API_KEY: ${GEMINI_API_KEY}
-      MONGO_URL: mongodb://mongo:27017/readings
+      MONGO_URL: mongodb://mongoadmin:FDrs81eAMi6x1*_g@mongo:27017/shopper?authSource=admin
       MINIO_ENDPOINT: minio
       MINIO_PORT: 9000
       MINIO_ROOT_USER: minioadmin
-      MINIO_ROOT_PASSWORD: 8@GvL#2uD!wz3T*mKp9F&Qx
+      MINIO_ROOT_PASSWORD: T&se9g0_sM0m
     depends_on:
       mongo:
         condition: service_healthy
@@ -66,11 +68,10 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 1s
 
 volumes:
   mongo-data:
-  minio-data:
+  mini-data:
 
 networks:
   shopper:
