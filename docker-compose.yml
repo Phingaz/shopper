@@ -9,8 +9,8 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: mongoadmin
       MONGO_INITDB_ROOT_PASSWORD: FDrs81eAMi6x1*_g
-    # ports:
-    #   - "27017:27017"
+    ports:
+      - "27017:27017"
     volumes:
       - mongo-data:/data/db
     networks:
@@ -18,28 +18,6 @@ services:
     healthcheck:
       test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
       interval: 15s
-      timeout: 10s
-      retries: 3
-
-  # MinIO service
-  minio:
-    image: minio/minio:latest
-    container_name: minio
-    restart: always
-    environment:
-      MINIO_ROOT_USER: minioadmin
-      MINIO_ROOT_PASSWORD: T&se9g0_sM0m
-    ports:
-      - "9000:9000"
-      - "9001:9001"
-    volumes:
-      - mini-data:/data
-    command: server /data --console-address ":9001"
-    networks:
-      - shopper
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
-      interval: 30s
       timeout: 10s
       retries: 3
 
@@ -53,14 +31,9 @@ services:
     environment:
       GEMINI_API_KEY: ${GEMINI_API_KEY}
       MONGO_URL: mongodb://mongoadmin:FDrs81eAMi6x1*_g@mongo:27017/shopper?authSource=admin
-      MINIO_ENDPOINT: minio
-      MINIO_PORT: 9000
-      MINIO_ROOT_USER: minioadmin
-      MINIO_ROOT_PASSWORD: T&se9g0_sM0m
+      BASE_URL: http://localhost:3001
     depends_on:
       mongo:
-        condition: service_healthy
-      minio:
         condition: service_healthy
     networks:
       - shopper
@@ -72,7 +45,6 @@ services:
 
 volumes:
   mongo-data:
-  mini-data:
 
 networks:
   shopper:

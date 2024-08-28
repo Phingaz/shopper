@@ -2,12 +2,8 @@ import Reading from "../models/gemini.js";
 import { TMeasurementType, TUploadBody } from "../types/gemini.js";
 import { errorHandler, successHandler } from "../utils/resHandler.js";
 import { generateRandomUuid, processBase64Image } from "../utils/util.js";
-import {
-  handleUploadAndDelete,
-  saveBase64Image,
-} from "../utils/handleImage.js";
+import { handleImage, saveBase64Image } from "../utils/handleImage.js";
 import { promptGemini } from "../utils/promptGemini.js";
-import minioClient, { bucketName } from "../utils/minio.js";
 import { measurementTypes } from "../constants.js";
 
 const listMeasures = async (req: Req, res: Res) => {
@@ -30,7 +26,7 @@ const listMeasures = async (req: Req, res: Res) => {
     // Fetch measures
     const measures = await Reading.find({
       customer_code: id,
-      ...(measure_type && { measure_type })
+      ...(measure_type && { measure_type }),
     }).select("-_id -__v -createdAt -updatedAt -customer_code -measure_value");
 
     if (!measures.length) {
@@ -108,25 +104,10 @@ const upload = async (req: Req, res: Res) => {
       .toISOString()
       .replace(/[^0-9]/g, "")
       .slice(0, 14);
+
     const fileName = `${customer_code}-${measure_type}-${formattedDate}.${type}`;
-    const localImage = await saveBase64Image({
-      base64: data,
-      filename: fileName,
-    });
 
-    await handleUploadAndDelete({
-      bucketName,
-      fileName,
-      localImage,
-      type,
-    });
-
-    const presignedUrl = await minioClient.presignedUrl(
-      "GET",
-      bucketName,
-      fileName,
-      60 * 60 * 3
-    );
+    const imgUrl = await handleImage({ fileName, base64: data });
 
     const value = geminiResult?.measure_value
       ? parseInt(geminiResult.measure_value)
@@ -136,7 +117,7 @@ const upload = async (req: Req, res: Res) => {
     // Save reading to the database
     await Reading.create({
       customer_code,
-      image_url: presignedUrl,
+      image_url: imgUrl,
       measure_datetime,
       measure_type,
       measure_uuid: uuid,
@@ -148,7 +129,7 @@ const upload = async (req: Req, res: Res) => {
       req,
       res,
       data: {
-        image_url: presignedUrl,
+        image_url: imgUrl,
         measure_value: value,
         measure_uuid: uuid,
       },

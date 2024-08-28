@@ -5,7 +5,6 @@ import express from "express";
 import mongoose from "mongoose";
 import { fileURLToPath } from "url";
 import path, { dirname } from "path";
-import { getBucket } from "./utils/minio.js";
 import { router as gemini } from "./routes/gemini.js";
 import { router as health } from "./routes/healthcheck.js";
 import { logger, expectJsonBody } from "./middlewares/helpers.js";
@@ -53,7 +52,7 @@ app.all("*", (req: Req, res: Res) =>
 // Start the server
 const start = async () => {
   try {
-    await Promise.all([mongoose.connect(process.env.MONGO_URL), getBucket()]);
+    await mongoose.connect(process.env.MONGO_URL);
     console.log("Connected to database and storage.");
     app.listen(port, () => console.log(`App started on port ${port}`));
   } catch (error) {
