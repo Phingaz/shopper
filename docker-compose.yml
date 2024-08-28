@@ -31,7 +31,7 @@ services:
     environment:
       GEMINI_API_KEY: ${GEMINI_API_KEY}
       MONGO_URL: mongodb://mongoadmin:FDrs81eAMi6x1*_g@mongo:27017/shopper?authSource=admin
-      BASE_URL: http://localhost:3001
+      BASE_URL: ${BASE_URL:-http://localhost:3001}
     depends_on:
       mongo:
         condition: service_healthy
