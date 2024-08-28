@@ -42,9 +42,12 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
+    volumes:
+      - app-uploads:/app/public/uploads
 
 volumes:
   mongo-data:
+  app-uploads:
 
 networks:
   shopper:
